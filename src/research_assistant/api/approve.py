@@ -9,7 +9,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 # 从 hitl 导入恢复执行的函数
-from research_assistant.core.hitl import resume
+from research_assistant.core.human_in_the_loop.manager import resume
 
 
 # 本模块的路由器

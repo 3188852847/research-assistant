@@ -5,7 +5,7 @@
 """
 
 # 导入读文件工具：写作员可能需要读研究员存下的材料
-from research_assistant.core.tools.files import read_pdf, read_csv
+from research_assistant.core.tools.local.files import read_pdf, read_csv
 
 # 写作员子代理定义
 writer = {

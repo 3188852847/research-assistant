@@ -10,7 +10,7 @@ from langgraph.types import Command
 
 
 # 从共享依赖取 agent（全局唯一实例）
-from research_assistant.core.deps import agent
+from research_assistant.core.common.deps import agent
 
 def check_interrupts(result) -> list[dict] | None:
     """检查 agent 调用结果是否被中断。

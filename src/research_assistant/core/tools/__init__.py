@@ -1,26 +1,17 @@
-"""工具集：所有工具的注册入口。
+"""工具集：聚合本地 + 联网工具，对外统一导出 TOOLS。
 
-本文件只负责汇总导出工具，工具的具体实现在各个独立模块里
-（如 basic.py 放基础工具）。agent 构建时只需从这里导入 TOOLS 一次。
+tools/ 按能力分层：
+- local/：纯本地（时间/计算/读文件），不依赖外部服务
+- web/：联网（Tavily 搜索），依赖外部 API
+
+新增工具原则：
+- 纯本地 → 放 local/，加进 LOCAL_TOOLS
+- 联网/外部服务 → 放 web/（或新建子包），加进 WEB_TOOLS
 """
 
-# 从 basic 模块导入两个工具函数
-# 模块路径规则：research_assistant.tools.basic 表示
-# research_assistant/tools/ 目录下的 basic.py 文件
-from research_assistant.core.tools.basic import get_current_time, calculator
+# 从子包导入工具列表
+from research_assistant.core.tools.local import LOCAL_TOOLS
+from research_assistant.core.tools.web import WEB_TOOLS
 
-# 从 web 模块导入联网搜索工具
-from research_assistant.core.tools.web import internet_search
-
-# 从 files 模块导入 PDF/CSV 读取工具
-from research_assistant.core.tools.files import read_pdf, read_csv
-
-
-
-
-
-
-# TOOLS 列表：把工具汇总成列表，供 agent 挂载
-# 以后新增工具：在新模块里实现 → 在这里 import → 追加进列表
-# 这样 agent.py 永远只需要 TOOLS 一个入口，不用感知每个工具细节
-TOOLS = [get_current_time, calculator, internet_search, read_pdf, read_csv]
+# 对外统一出口：agent 组装时只需 import TOOLS
+TOOLS = LOCAL_TOOLS + WEB_TOOLS

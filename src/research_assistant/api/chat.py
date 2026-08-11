@@ -4,7 +4,7 @@
 """
 
 # 从共享依赖取 agent（全局唯一实例）
-from research_assistant.core.deps import agent
+from research_assistant.core.common.deps import agent
 
 # 导入 FastAPI 的 APIRouter（路由注册器）
 from fastapi import APIRouter
@@ -12,7 +12,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 # 从 hitl 导入检查中断的函数
-from research_assistant.core.hitl import check_interrupts
+from research_assistant.core.human_in_the_loop.manager import check_interrupts
 
 # 创建本模块的路由器
 # prefix="/api" 表示这个路由下所有接口的 URL 都以 /api 开头

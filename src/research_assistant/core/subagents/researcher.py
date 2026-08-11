@@ -8,7 +8,7 @@
 # 导入联网检索工具（M2 写的）
 from research_assistant.core.tools.web import internet_search
 # 导入读 PDF/CSV 工具（M2 写的，读论文/数据）
-from research_assistant.core.tools.files import read_pdf, read_csv
+from research_assistant.core.tools.local.files import read_pdf, read_csv
 
 # 研究员子代理定义（deepagents 的 subagents 字典格式）
 researcher = {

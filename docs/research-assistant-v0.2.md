@@ -23,7 +23,7 @@
 
 ## 3. 踩坑记录（本阶段新增）
 
-- `web.py` 模块级读 TAVILY_API_KEY 报 KeyError → 模块自己先 load_dotenv()（import 阶段就执行，不能依赖 config 的延迟加载）
+- `search.py` 模块级读 TAVILY_API_KEY 报 KeyError → 模块自己先 load_dotenv()（import 阶段就执行，不能依赖 config 的延迟加载）
 - 测试数据应放 tests/ 而非项目根目录（规范）
 - pytest 尚未引入，tests/ 目前只放测试数据（M7 再补自动化测试）
 

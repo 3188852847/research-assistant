@@ -5,8 +5,8 @@ pytest 会自动发现 test_*.py 文件里的 test_* 函数并执行。
 """
 
 # 导入要测试的工具函数
-from research_assistant.core.tools.basic import calculator
-from research_assistant.core.tools.files import read_csv
+from research_assistant.core.tools.local.basic import calculator
+from research_assistant.core.tools.local.files import read_csv
 
 
 # ---- calculator 测试 ----

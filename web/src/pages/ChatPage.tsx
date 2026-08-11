@@ -1,12 +1,11 @@
-// 应用根组件：会话管理 + 聊天界面
-// 负责 thread_id 的生成和切换（新建会话/继续会话）
+// 对话页面：会话管理 + 聊天界面
+// 页面级组件：从 App.tsx 拆出的「对话」页面职责
+// 将来新增页面（设置页/历史页…）也放 pages/ 下，App 只做路由
 
-// 导入 React Hooks：useState（状态）
+// 导入 React Hooks：useState
 import { useState } from 'react'
-// 导入聊天组件
-import Chat from './components/Chat'
-// 导入样式
-import './App.css'
+// 导入聊天组件（从组件出口聚合拿）
+import { Chat } from '../components'
 
 // 生成新会话 ID 的函数：时间戳 + 随机数
 // 会话 ID 是后端 checkpointer 识别会话的钥匙，每次新建会话生成一个唯一的
@@ -14,29 +13,25 @@ function newThreadId(): string {
   return 'thread-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)
 }
 
-// 应用根组件
-function App() {
+// 对话页面组件
+export default function ChatPage() {
   // threadId: 当前会话 ID，初始生成一个
   const [threadId, setThreadId] = useState<string>(newThreadId())
 
-  // 切换会话的函数：生成新 ID 传给 Chat（Chat 内部消息列表会清空吗？不会，见下方说明）
+  // 切换会话：生成新 ID（key 变化会让 Chat 整体重建，消息清空）
   function switchThread() {
     setThreadId(newThreadId())
   }
 
   return (
-    // 页面容器
     <div className="app">
       {/* 顶栏：标题 + 新建会话按钮 */}
       <header className="app-header">
         <h1>research-assistant</h1>
         <button onClick={switchThread}>新建会话</button>
       </header>
-      {/* key={threadId}：thread 变化时 Chat 组件整体重建，消息历史自动清空 */}
+      {/* 聊天主区域：key={threadId} 让会话切换时组件重建 */}
       <Chat key={threadId} threadId={threadId} />
     </div>
   )
 }
-
-// 导出根组件（main.tsx 会用到）
-export default App

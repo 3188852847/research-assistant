@@ -9,7 +9,18 @@
 # research_assistant/tools/ 目录下的 basic.py 文件
 from research_assistant.core.tools.basic import get_current_time, calculator
 
+# 从 web 模块导入联网搜索工具
+from research_assistant.core.tools.web import internet_search
+
+# 从 files 模块导入 PDF/CSV 读取工具
+from research_assistant.core.tools.files import read_pdf, read_csv
+
+
+
+
+
+
 # TOOLS 列表：把工具汇总成列表，供 agent 挂载
 # 以后新增工具：在新模块里实现 → 在这里 import → 追加进列表
 # 这样 agent.py 永远只需要 TOOLS 一个入口，不用感知每个工具细节
-TOOLS = [get_current_time, calculator]
+TOOLS = [get_current_time, calculator, internet_search, read_pdf, read_csv]

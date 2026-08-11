@@ -27,6 +27,7 @@
 - `core/tools/__init__.py` — 工具汇总导出（TOOLS）；
 - `core/tools/` — 工具集：basic.py（时间/计算器）、web.py（Tavily 联网检索）、files.py（read_pdf/read_csv）；`__init__.py` 汇总导出 TOOLS
 - `core/subagents/` — researcher（联网调研）、writer（整理报告）；`core/memory/AGENTS.md` — agent 记忆文件（M4 已启用，memory 参数注入 + 会话 checkpointer）
+- `core/hitl.py` — 人机回环（M5）：check_interrupts（提取待审操作）+ resume（Command 恢复）；`api/` 拆分为 chat.py/approve.py/health.py
 - `docs/` — 版本说明文档（v0.1 已出）
 
 ## Conventions

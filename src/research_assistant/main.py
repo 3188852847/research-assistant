@@ -9,7 +9,7 @@ from fastapi import FastAPI
 
 # 导入路由层（api/routes.py 里的 router）
 # 对话接口 /api/chat、健康检查 /api/health 都在 router 里定义
-from research_assistant.api.routes import router
+from research_assistant.api import router
 
 
 

@@ -62,7 +62,20 @@ def build_agent():
         subagents=[researcher, writer],  # 子代理：复杂任务委派给研究员调研、写作员成文
         memory=["/src/research_assistant/core/memory/AGENTS.md"],  # 记忆文件：指向我们自己的 agent 记忆（角色/偏好/准则）
         checkpointer=checkpointer,  # 检查点：保存每个会话的状态（对话历史），会话内多轮记忆的基础
+
+
+
+
+        interrupt_on={ # 人机回环：哪些工具要人工审批
+            "delete": {"allowed_decisions": ["approve", "edit", "reject"]}, # 高风险：删除/执行命令，全开（可批准/可编辑/可拒绝）
+            "execute": {"allowed_decisions": ["approve", "reject"]},
+            "write_file": {"allowed_decisions": ["approve", "reject"]}, # 中风险：写文件/改文件，允许批准或拒绝
+            "edit_file": {"allowed_decisions": ["approve", "reject"]},
+            # 低风险（读文件/搜索/自定义工具）不配置 = 不中断
+        },
+
         debug=False,  # debug: 设为 True 会打印 agent 思考/调用工具的详细过程，方便排查。注：M1 调试阶段先开 True，跑通后改成 False 保持输出干净
+
     )
     # 把组装好的 agent 返回给调用方（main.py 用）
     return agent

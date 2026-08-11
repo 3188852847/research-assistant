@@ -16,6 +16,7 @@
 - 安装依赖：`uv add <包名>`（不用 pip）；同步项目：`uv sync`
 - 单文件验证：`uv run python -c "..."`（先 import 再执行）
 - git：`git add .` → `git commit -m "..."` → `git push`
+- 测试：`uv run pytest`（tests/ 下核心工具测试，testpaths 已配置）
 
 ## Architecture
 

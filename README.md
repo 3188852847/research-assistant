@@ -80,7 +80,7 @@ research-assistant/
 - **M7 收尾**：文档补全、测试补全、复盘沉淀
 
 > **Web 路线**：M1-M5 全程 FastAPI + Swagger 交互文档（浏览器点按钮就能测，比 CLI 好看且零前端成本）→ M6 一次性上真前端。
-
+> **当前进度**：M1-M6 全部完成（2026-08-11），M7 收尾中。五大能力 + Web 前端已落地，见 `docs/` 各版本说明。
 ## 六、验收标准
 
 每个里程碑完成后自问：
@@ -96,6 +96,21 @@ research-assistant/
 - [ ] 记忆方案（文件 / 向量库 / 复用腾讯记忆栈？）—— 先本地文件起步，够用再说
 - [ ] 预算控制：DeepSeek 便宜但子代理多轮也花钱，M3 后评估用量
 
+## 八、使用说明
+
+### 开发模式（前后端分离，热更新）
+- 后端：`uv run uvicorn research_assistant.main:app --reload`（:8000，Swagger 在 /docs）
+- 前端：`cd src/research_assistant/web && npm run dev`（:5173，代理转发 /api 到 :8000）
+
+### 生产模式（一条命令）
+- 构建前端：`cd src/research_assistant/web && npm run build`
+- 启动：`uv run uvicorn research_assistant.main:app --reload`（:8000，直接访问界面）
+
+### 测试
+- `uv run pytest`（8 个核心工具测试）
+
+### CLI 备用入口
+- `uv run python -m research_assistant.core.cli`
 ---
 
 *项目启动：2026-08-11 · 配套基础笔记见 vault「100-基础」*

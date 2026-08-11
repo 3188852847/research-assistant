@@ -8,14 +8,9 @@
 # 中断后用它携带用户的决策（批准/拒绝/编辑）续跑 agent
 from langgraph.types import Command
 
-# 导入 agent 构建函数（hitl 需要知道 agent 是谁才能恢复）
-from research_assistant.core.agent import build_agent
 
-# 模块级构建 agent（服务启动时构建一次，所有请求复用）
-# 和 routes.py 里的 agent 是同一个，但这里独立构建更清晰
-# 注意：人机回环要求 checkpointer 存在，agent.py 已配好
-agent = build_agent()
-
+# 从共享依赖取 agent（全局唯一实例）
+from research_assistant.core.deps import agent
 
 def check_interrupts(result) -> list[dict] | None:
     """检查 agent 调用结果是否被中断。
@@ -69,7 +64,7 @@ def resume(thread_id: str, decisions: list[dict]) -> dict:
             [{"type": "approve"}] 或 [{"type": "reject"}]
             或 [{"type": "edit", "edited_action": {"name": 工具名, "args": {...}}}]
     返回:
-        {"reply": 最终回复, "interrupts": 是否再次中断}
+        {"reply": 最终回复, "pending": 是否再次中断}
     """
     # 用 Command 携带决策恢复执行
     # config 必须用同一个 thread_id（人机回环恢复的硬性要求）

@@ -3,6 +3,9 @@
 人机回环：遇到需审批的操作时返回 pending（待审操作），不返回最终回复。
 """
 
+# 从共享依赖取 agent（全局唯一实例）
+from research_assistant.core.deps import agent
+
 # 导入 FastAPI 的 APIRouter（路由注册器）
 from fastapi import APIRouter
 # 从 pydantic 导入 BaseModel——请求/响应的数据结构定义

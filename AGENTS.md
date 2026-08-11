@@ -29,6 +29,8 @@
 - `core/subagents/` — researcher（联网调研）、writer（整理报告）；`core/memory/AGENTS.md` — agent 记忆文件（M4 已启用，memory 参数注入 + 会话 checkpointer）
 - `core/hitl.py` — 人机回环（M5）：check_interrupts（提取待审操作）+ resume（Command 恢复）；`api/` 拆分为 chat.py/approve.py/health.py
 - `docs/` — 版本说明文档（v0.1 已出）
+- `core/deps.py` — 全局唯一 agent 实例（M6：人机回环状态共享的关键，chat/approve/hitl 都从这里取）
+- `web/` — React+TS 前端（M6 启用）：dev 用 vite 代理，prod 由 main.py 托管 dist
 
 ## Conventions
 

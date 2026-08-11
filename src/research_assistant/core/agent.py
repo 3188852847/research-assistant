@@ -58,7 +58,9 @@ def build_agent():
             "复杂研究任务：先委派给 researcher 子代理联网调研，再委派给 writer 子代理整理成报告。"
         ),
         tools=TOOLS,  # tools: 追加自定义工具（内置的 ls/read_file/execute 等 9 个工具自动保留）
-        backend=LocalShellBackend(), # backend: 本地文件系统后端，文件真实落盘到当前工作目录
+        backend=LocalShellBackend(
+            root_dir=str(Path(__file__).parent.parent.parent.parent)  # 项目根：core/agent.py → 上推 4 级
+        ),  # backend: 本地文件系统后端，root_dir 固定为项目根，任何启动目录下都一致
         subagents=[researcher, writer],  # 子代理：复杂任务委派给研究员调研、写作员成文
         memory=["/src/research_assistant/core/memory/AGENTS.md"],  # 记忆文件：指向我们自己的 agent 记忆（角色/偏好/准则）
         checkpointer=checkpointer,  # 检查点：保存每个会话的状态（对话历史），会话内多轮记忆的基础

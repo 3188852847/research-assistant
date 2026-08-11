@@ -2,6 +2,8 @@
 
 启动方式：uv run uvicorn research_assistant.main:app --reload
 """
+# 导入 FastAPI 的静态文件托管
+from fastapi.staticfiles import StaticFiles
 
 # 导入 FastAPI：Web 框架本体
 # app 对象是 FastAPI 应用的核心，uvicorn 加载它来运行服务
@@ -11,7 +13,9 @@ from fastapi import FastAPI
 # 对话接口 /api/chat、健康检查 /api/health 都在 router 里定义
 from research_assistant.api import router
 
-
+# 计算前端构建产物目录（绝对路径，不依赖启动目录）
+from pathlib import Path
+web_dist = Path(__file__).parent / "web" / "dist"
 
 
 # 创建 FastAPI 应用实例
@@ -22,6 +26,11 @@ app = FastAPI(
 
 # 把路由注册进应用
 app.include_router(router) # 这样 router 里所有以 /api 开头的接口都挂到了 app 上
+
+# 挂载前端静态文件（M6 生产模式）
+# web/dist 是 npm run build 的产物目录
+# name="static" 是挂载点标识，FastAPI 内部用
+app.mount("/", StaticFiles(directory=str(web_dist), html=True), name="static")
 
 
 # Python 的入口约定：只有直接运行本文件时（python -m research_assistant.main）才执行

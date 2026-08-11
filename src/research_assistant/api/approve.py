@@ -11,6 +11,7 @@ from pydantic import BaseModel
 # 从 hitl 导入恢复执行的函数
 from research_assistant.core.hitl import resume
 
+
 # 本模块的路由器
 router = APIRouter(prefix="/api")
 
@@ -27,7 +28,9 @@ class ApproveRequest(BaseModel):
     decisions: list[dict]
 
 
-# 新增审批接口：用户提交决策，恢复 agent 执行
+# 审批接口：用户提交决策，恢复 agent 执行
+# 注意：resume 内部用 deps 的全局 agent（与 /api/chat 同一实例），
+# 所以这里不需要再 import agent
 @router.post("/approve")
 def approve(request: ApproveRequest) -> dict:
     """提交人机回环的审批决策，恢复 agent 执行。

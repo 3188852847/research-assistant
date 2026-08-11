@@ -28,8 +28,10 @@ class ChatRequest(BaseModel):
     """POST /api/chat 的请求体。
 
     message: 用户输入的问题文本
+    thread_id: 会话 ID——同一个 ID 的多轮对话共享历史（会话内记忆）
     """
     message: str
+    thread_id: str = "default"  # 默认会话 ID；不传则所有请求都进同一个会话
 
 
 # 定义对话响应的数据结构
@@ -56,13 +58,15 @@ def health() -> dict:
 def chat(request: ChatRequest) -> ChatResponse:
     """接收用户消息，调用 agent 回答。
 
-    注意：本函数用 def 而非 async def 定义。
-    FastAPI 会自动把普通 def 端点放进线程池执行，
-    这样 agent.invoke()（同步阻塞调用）不会卡住事件循环。
+    thread_id 决定会话：同一 thread_id 的多轮调用共享对话历史（短期记忆），
+    不同 thread_id 互相隔离（不同会话）。
     """
     # 调用 agent：把用户消息作为一条 user 消息传进去
-    # invoke 返回结果对象，里面包含多轮消息
-    result = agent.invoke({"messages": [{"role": "user", "content": request.message}]})
+    # config 里带 thread_id——checkpointer 按它存取会话历史
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": request.message}]},
+        config={"configurable": {"thread_id": request.thread_id}},
+    )
 
     # 取最后一条消息的文本内容，就是 agent 的最终回复
     final_answer = result["messages"][-1].content

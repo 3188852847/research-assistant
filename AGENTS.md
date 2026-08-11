@@ -26,7 +26,7 @@
 - `core/cli.py` — CLI 对话循环（备用调试入口）
 - `core/tools/__init__.py` — 工具汇总导出（TOOLS）；
 - `core/tools/` — 工具集：basic.py（时间/计算器）、web.py（Tavily 联网检索）、files.py（read_pdf/read_csv）；`__init__.py` 汇总导出 TOOLS
-- `core/subagents/` — M3 已启用：researcher（联网调研）、writer（整理报告）；memory/skills 仍为 M4/M5 占位
+- `core/subagents/` — researcher（联网调研）、writer（整理报告）；`core/memory/AGENTS.md` — agent 记忆文件（M4 已启用，memory 参数注入 + 会话 checkpointer）
 - `docs/` — 版本说明文档（v0.1 已出）
 
 ## Conventions

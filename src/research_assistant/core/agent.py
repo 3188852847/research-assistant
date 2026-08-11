@@ -20,6 +20,11 @@ from research_assistant.core.config import load_settings
 # 从 tools 包导入工具汇总列表（get_current_time + calculator）
 from research_assistant.core.tools import TOOLS
 
+# 导入子代理定义（M3：研究员 + 写作员）
+from research_assistant.core.subagents.researcher import researcher
+from research_assistant.core.subagents.writer import writer
+
+
 
 # 构建并返回主 agent 的函数
 # 返回类型注解：create_deep_agent 返回的对象（deepagents 的 agent）
@@ -31,14 +36,16 @@ def build_agent():
     # 调用 create_deep_agent 组装 agent
     agent = create_deep_agent(
         model=settings.model,  # model: 指定模型。deepagents 从 .env 读取 DEEPSEEK_API_KEY 等配置。注：.env 不会自动加载，必须先在 config.py 里 load_dotenv()
-        system_prompt=( # system_prompt: 给模型设定身份和行为准则
+        system_prompt=(
             "你是 research-assistant，一个跑在用户自己电脑上的个人研究助手。\n"
             "你的能力：检索资料、读论文、整理知识、按需调用工具。\n"
             "回答使用中文，简洁准确；涉及时间、计算等具体问题时，优先调用工具获取准确结果，"
-            "不要凭记忆猜测。"
+            "不要凭记忆猜测。\n"
+            "复杂研究任务：先委派给 researcher 子代理联网调研，再委派给 writer 子代理整理成报告。"
         ),
         tools=TOOLS,  # tools: 追加自定义工具（内置的 ls/read_file/execute 等 9 个工具自动保留）
         backend=LocalShellBackend(), # backend: 本地文件系统后端，文件真实落盘到当前工作目录
+        subagents=[researcher, writer],  # 子代理：复杂任务委派给研究员调研、写作员成文
         debug=False,  # debug: 设为 True 会打印 agent 思考/调用工具的详细过程，方便排查。注：M1 调试阶段先开 True，跑通后改成 False 保持输出干净
     )
     # 把组装好的 agent 返回给调用方（main.py 用）

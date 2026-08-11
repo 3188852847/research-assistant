@@ -39,7 +39,7 @@ def build_agent():
         ),
         tools=TOOLS,  # tools: 追加自定义工具（内置的 ls/read_file/execute 等 9 个工具自动保留）
         backend=LocalShellBackend(), # backend: 本地文件系统后端，文件真实落盘到当前工作目录
-        debug=True,  # debug: 设为 True 会打印 agent 思考/调用工具的详细过程，方便排查。注：M1 调试阶段先开 True，跑通后改成 False 保持输出干净
+        debug=False,  # debug: 设为 True 会打印 agent 思考/调用工具的详细过程，方便排查。注：M1 调试阶段先开 True，跑通后改成 False 保持输出干净
     )
     # 把组装好的 agent 返回给调用方（main.py 用）
     return agent

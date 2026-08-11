@@ -1,0 +1,40 @@
+# AGENTS.md
+
+> 个人研究助手（research-assistant）—— 跑在本地的 DeepAgents 实战项目。此文件是给 AI 助手看的项目指南，每行都进入会话上下文，保持精简。
+
+## Project
+
+- 定位：本地命令行 AI 研究助手（检索资料、读论文、整理知识、按需调工具）
+- 技术栈：Python 3.12 / uv / deepagents 0.7.x / langchain-deepseek / DeepSeek API（deepseek-chat 或 deepseek-v4-flash，见 .env）
+- 入口：`src/research_assistant/main.py`（CLI 对话循环）；M1 已完成，M2 起接入真实工具
+- 语言：代码注释、提示词、文档一律中文
+
+## Commands
+
+- 启动对话：`uv run python -m research_assistant.main`
+- 安装依赖：`uv add <包名>`（不用 pip）
+- 同步/安装项目自身：`uv sync`
+- 单文件快速验证：`uv run python -c "..."`（先 import 再执行）
+- git：`git add .` → `git commit -m "..."` → `git push`（每阶段结束提交一次）
+
+## Architecture
+
+- `main.py` — CLI 对话循环（build_agent + input 循环 + exit/quit 退出）
+- `agent.py` — `build_agent()`：create_deep_agent 组装模型/工具/system_prompt/backend
+- `config.py` — 配置唯一入口：load_settings() 读 .env 并校验，settings_summary() 脱敏打印 key
+- `tools/__init__.py` — 工具汇总导出（TOOLS 列表）
+- `tools/basic.py` — 基础工具：get_current_time / calculator（普通函数 + docstring）
+- `docs/` — 版本说明文档（research-assistant-v0.1.md，M2 起 v0.2…）
+
+## Conventions
+
+- **代码逐行写详细中文注释**（每行都要说明作用，不只 docstring）——用户硬性要求
+- **创建文件/目录一律让用户手动操作**（PyCharm 等），只给「位置 + 文件名 + 内容」，不给命令行创建指令
+- 工具 = 带 docstring 的普通函数（deepagents 风格），docstring 首行说明用途 + Args 段逐参数
+- src layout：代码在 `src/research_assistant/`（下划线包名），配置在项目根 `research-assistant/`（连字符目录名）
+- 密钥只在 .env（已 gitignore），程序里打印 key 必须走 settings_summary() 脱敏
+- 配置集中读 config.py，不在别处直接 os.getenv
+
+## Notes
+
+- （待补充：M2 接入真实工具后的经验）

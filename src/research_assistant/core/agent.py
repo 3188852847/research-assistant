@@ -29,6 +29,9 @@ from langgraph.checkpoint.memory import MemorySaver
 # 导入 create_file_data：把记忆文件内容装进 agent 的文件系统
 from deepagents.backends.utils import create_file_data
 
+# 导入技能源目录（core/skills 包导出的常量）
+from research_assistant.core.skills import SKILLS_DIR
+
 # 构建并返回主 agent 的函数
 # 返回类型注解：create_deep_agent 返回的对象（deepagents 的 agent）
 def build_agent():
@@ -62,6 +65,7 @@ def build_agent():
             root_dir=str(Path(__file__).parent.parent.parent.parent)  # 项目根：core/agent.py → 上推 4 级
         ),  # backend: 本地文件系统后端，root_dir 固定为项目根，任何启动目录下都一致
         subagents=[researcher, writer],  # 子代理：复杂任务委派给研究员调研、写作员成文
+        skills=[SKILLS_DIR],  # 技能源目录：agent 按需加载技能（渐进式披露）
         memory=["/src/research_assistant/core/memory/AGENTS.md"],  # 记忆文件：指向我们自己的 agent 记忆（角色/偏好/准则）
         checkpointer=checkpointer,  # 检查点：保存每个会话的状态（对话历史），会话内多轮记忆的基础
 

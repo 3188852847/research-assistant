@@ -6,7 +6,8 @@
 # 导入构建 agent 的函数
 # 注意路径：agent.py 已迁移到 core/ 下，import 路径相应更新
 from research_assistant.core.agent import build_agent
-
+# 导入进度可视化（presenters 层）
+from research_assistant.core.presenters import stream_with_progress
 
 # 主对话循环函数（与原 main.py 逻辑一致）
 def main() -> None:
@@ -36,16 +37,27 @@ def main() -> None:
             # continue 回到 while 开头，重新等待输入
             continue
 
-        # 调用 agent，把用户输入作为一条 user 消息传进去
-        # invoke 返回一个结果对象，里面包含多轮消息
-        result = agent.invoke({"messages": [{"role": "user", "content": user_input}]})
+        # 调用 agent 并实时显示思考过程（stream 流式 + 进度可视化）
+        # 每次 event 翻译成一行进度打印，用户能看到 agent 在干什么
+        last_content = ""
+        for line in stream_with_progress(
+                agent,
+                {"messages": [{"role": "user", "content": user_input}]},
+                {"configurable": {"thread_id": "cli"}},  # CLI 用固定会话 ID（简单起见）
+        ):
+            # 进度行直接打印（带缩进区分于正式回复）
+            print(f"  {line}")
 
-        # 取结果里的最后一条消息，就是 agent 的最终回复
-        # result["messages"] 是一个消息列表，[-1] 表示最后一个元素
-        # .content 是消息的文本内容
+        # 进度流里没有返回最终回复，需要再取一次
+        # 用 invoke 拿最终结果（stream 只是展示过程，结果仍要 invoke）
+        # 注意：这里会再调一次模型？不——CLI 场景简化为：
+        # 进度可视化后，重新 invoke 拿最终回复（简单可靠，代价是重复一次）
+        # invoke 必须带和 stream 相同的 config（checkpointer 需要 thread_id）
+        result = agent.invoke(
+            {"messages": [{"role": "user", "content": user_input}]},
+            config={"configurable": {"thread_id": "cli"}},
+        )
         final_answer = result["messages"][-1].content
-
-        # 打印 agent 的回复，前面加个 "agent > " 前缀区分是谁在说话
         print(f"agent > {final_answer}")
 
 

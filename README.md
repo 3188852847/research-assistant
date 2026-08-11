@@ -12,7 +12,7 @@
 
 - DeepAgents 教程 12 章已学完（0-11 全闭环），需要一个实战项目把知识变成能力
 - 现有工具栈（Hermes + Obsidian）已覆盖日常，但缺少一个「按自己需求定制」的研究助手
-- 9 月入学方向是长程记忆，本项目可作为实验载体，也是开题素材
+- 本项目可作为 AI 应用开发的学习载体与后续研究的实验平台
 
 ### 目标（做什么）
 
@@ -46,7 +46,7 @@
 
 > 依赖按需添加，不一次性装全（uv add，不用 pip）。
 
-## 四、项目结构（规划）
+## 四、项目结构（当前）
 
 ```
 research-assistant/
@@ -54,17 +54,24 @@ research-assistant/
 ├── pyproject.toml       # uv 项目定义
 ├── .env                 # API key（不入库）
 ├── src/research_assistant/
-│   ├── main.py          # 入口：启动 FastAPI 服务
-│   ├── api/             # 路由层：把核心能力暴露成 HTTP 接口
-│   │   └── routes.py
-│   ├── core/            # 核心逻辑（与外壳解耦，CLI/Web 共用）
+│   ├── main.py          # 入口：FastAPI app 工厂 + 静态托管
+│   ├── api/             # 表现层：HTTP 路由（chat/approve/health）
+│   ├── core/            # 领域层：业务逻辑（与外壳解耦，CLI/Web 共用）
 │   │   ├── agent.py     # 主 agent 构建
-│   │   ├── tools/       # 工具集
-│   │   ├── subagents/   # 子代理
-│   │   ├── memory/      # 记忆存取
-│   │   └── skills/      # 技能定义
-│   └── web/             # 前端静态资源（后期做漂亮界面时再展开）
-└── tests/               # 测试（用户亲自跑）
+│   │   ├── config.py    # 配置加载
+│   │   ├── cli.py       # CLI 备用入口（含思考过程可视化）
+│   │   ├── common/      # 业务共享单例（agent/settings）
+│   │   ├── tools/       # 工具集（local 本地 / web 联网 分层）
+│   │   ├── subagents/   # 子代理（researcher/writer）
+│   │   ├── memory/      # 记忆（AGENTS.md + store/loader 占位）
+│   │   ├── skills/      # 技能（按类别分目录，SKILL.md 按需加载）
+│   │   ├── human_in_the_loop/  # 人机回环子系统
+│   │   └── presenters/  # 呈现层（思考过程可视化）
+│   └── infrastructure/  # 基础设施层：日志/异常/token 统计/SQLite 持久化
+├── web/                 # 前端（React+TS，独立于 Python 包）
+│   └── src/{pages,components,api,hooks,styles}
+├── tests/               # 测试（unit/ 分层）
+└── data/                # 运行时数据（checkpoints.sqlite，不入库）
 ```
 
 ## 五、开发计划（里程碑）
@@ -80,7 +87,7 @@ research-assistant/
 - **M7 收尾**：文档补全、测试补全、复盘沉淀
 
 > **Web 路线**：M1-M5 全程 FastAPI + Swagger 交互文档（浏览器点按钮就能测，比 CLI 好看且零前端成本）→ M6 一次性上真前端。
-> **当前进度**：M1-M6 全部完成（2026-08-11），M7 收尾中。五大能力 + Web 前端已落地，见 `docs/` 各版本说明。
+> **当前进度**：M1-M7 全部完成（2026-08-11）。五大能力 + Web 前端 + 思考过程可视化已落地；结构大优化（api/core/infrastructure 分层、web 移到根目录）；基础设施（日志/异常/token 统计/SQLite 持久化）已建。见 `docs/` 各版本说明。
 ## 六、验收标准
 
 每个里程碑完成后自问：
@@ -92,25 +99,31 @@ research-assistant/
 
 ## 七、待定 / 风险
 
-- [ ] 具体子代理分工细节，做到 M3 再定
-- [ ] 记忆方案（文件 / 向量库 / 复用腾讯记忆栈？）—— 先本地文件起步，够用再说
-- [ ] 预算控制：DeepSeek 便宜但子代理多轮也花钱，M3 后评估用量
+- [x] 具体子代理分工细节 → M3 已定：研究员（联网调研）+ 写作员（成文）
+- [x] 预算控制 → 已建 token 用量统计（infrastructure/tracing.py），可量化评估
+- [ ] 记忆方案（文件 / 向量库 / 复用腾讯记忆栈？）→ 已落地文件版（M4），向量库升级待研究
 
 ## 八、使用说明
 
 ### 开发模式（前后端分离，热更新）
 - 后端：`uv run uvicorn research_assistant.main:app --reload`（:8000，Swagger 在 /docs）
-- 前端：`cd src/research_assistant/web && npm run dev`（:5173，代理转发 /api 到 :8000）
+- 前端：`cd web && npm run dev`（:5173，代理转发 /api 到 :8000）
 
 ### 生产模式（一条命令）
-- 构建前端：`cd src/research_assistant/web && npm run build`
+- 构建前端：`cd web && npm run build`
 - 启动：`uv run uvicorn research_assistant.main:app --reload`（:8000，直接访问界面）
 
 ### 测试
-- `uv run pytest`（8 个核心工具测试）
+- `uv run pytest`（核心工具测试，tests/unit/）
 
-### CLI 备用入口
+### CLI 备用入口（含思考过程可视化）
 - `uv run python -m research_assistant.core.cli`
+
+### 基础设施
+- 日志：`infrastructure/logging.py`（setup_logging + get_logger）
+- 持久化：SQLite 检查点（data/checkpoints.sqlite，对话历史跨重启保留）
+- token 统计：`infrastructure/tracing.py`（每次调用记录用量）
+- 技能：`core/skills/skills/{research,writing,coding}/`（SKILL.md 按需加载）
 ---
 
 *项目启动：2026-08-11 · 配套基础笔记见 vault「100-基础」*

@@ -24,8 +24,8 @@ from research_assistant.core.tools import TOOLS
 from research_assistant.core.subagents.researcher import researcher
 from research_assistant.core.subagents.writer import writer
 
-# 导入 MemorySaver：内存检查点，保存每个会话的状态（对话历史）
-from langgraph.checkpoint.memory import MemorySaver
+# 导入持久化检查点（SQLite，重启不丢会话）
+from research_assistant.infrastructure.persistence import get_checkpointer
 # 导入 create_file_data：把记忆文件内容装进 agent 的文件系统
 from deepagents.backends.utils import create_file_data
 
@@ -46,8 +46,8 @@ def build_agent():
     memories_dir = Path(__file__).parent / "memory"
     agents_md = (memories_dir / "AGENTS.md").read_text(encoding="utf-8")
 
-    # 创建检查点保存器：按会话（thread_id）保存状态
-    checkpointer = MemorySaver()
+    # 获取持久化检查点（SQLite 落盘，重启后会话历史仍在）
+    checkpointer = get_checkpointer()
 
 
     # 调用 create_deep_agent 组装 agent

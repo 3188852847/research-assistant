@@ -11,20 +11,22 @@
 
 ## Commands
 
-- 启动对话：`uv run python -m research_assistant.main`
-- 安装依赖：`uv add <包名>`（不用 pip）
-- 同步/安装项目自身：`uv sync`
-- 单文件快速验证：`uv run python -c "..."`（先 import 再执行）
-- git：`git add .` → `git commit -m "..."` → `git push`（每阶段结束提交一次）
+- 启动 Web 服务：`uv run uvicorn research_assistant.main:app --reload` → 浏览器开 http://127.0.0.1:8000/docs
+- CLI 备用入口：`uv run python -m research_assistant.core.cli`
+- 安装依赖：`uv add <包名>`（不用 pip）；同步项目：`uv sync`
+- 单文件验证：`uv run python -c "..."`（先 import 再执行）
+- git：`git add .` → `git commit -m "..."` → `git push`
 
 ## Architecture
 
-- `main.py` — CLI 对话循环（build_agent + input 循环 + exit/quit 退出）
-- `agent.py` — `build_agent()`：create_deep_agent 组装模型/工具/system_prompt/backend
-- `config.py` — 配置唯一入口：load_settings() 读 .env 并校验，settings_summary() 脱敏打印 key
-- `tools/__init__.py` — 工具汇总导出（TOOLS 列表）
-- `tools/basic.py` — 基础工具：get_current_time / calculator（普通函数 + docstring）
-- `docs/` — 版本说明文档（research-assistant-v0.1.md，M2 起 v0.2…）
+- `main.py` — FastAPI 入口（创建 app、注册路由、uvicorn 启动）
+- `api/routes.py` — HTTP 路由层：GET /api/health、POST /api/chat（模块级构建 agent 复用）
+- `core/agent.py` — `build_agent()`：create_deep_agent 组装模型/工具/system_prompt/backend
+- `core/config.py` — 配置唯一入口：load_settings() 读 .env 校验，settings_summary() 脱敏
+- `core/cli.py` — CLI 对话循环（备用调试入口）
+- `core/tools/__init__.py` — 工具汇总导出（TOOLS）；`core/tools/basic.py` — 基础工具
+- `core/subagents|memory|skills/` — M3/M4/M5 占位；`web/` — M6 前端占位
+- `docs/` — 版本说明文档（v0.1 已出）
 
 ## Conventions
 

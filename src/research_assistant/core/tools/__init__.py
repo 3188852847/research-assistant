@@ -7,7 +7,7 @@
 # 从 basic 模块导入两个工具函数
 # 模块路径规则：research_assistant.tools.basic 表示
 # research_assistant/tools/ 目录下的 basic.py 文件
-from research_assistant.tools.basic import get_current_time, calculator
+from research_assistant.core.tools.basic import get_current_time, calculator
 
 # TOOLS 列表：把工具汇总成列表，供 agent 挂载
 # 以后新增工具：在新模块里实现 → 在这里 import → 追加进列表

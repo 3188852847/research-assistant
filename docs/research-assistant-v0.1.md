@@ -56,6 +56,16 @@
 
 （详细版见 Obsidian vault「research-assistant-项目经历.md」）
 
+## 5.5 Web 化更新（2026-08-11 同日）
+
+README 更新为 Web 形态（FastAPI + Swagger，最终 M6 做漂亮前端）后，M1 骨架同步升级：
+
+- 结构迁移：扁平 → 三层（api 路由层 + core 核心逻辑 + web 前端），CLI 保留为 core/cli.py 备用入口
+- FastAPI 服务：`uv run uvicorn research_assistant.main:app --reload`，Swagger 在 http://127.0.0.1:8000/docs
+- 接口：GET /api/health（健康检查）、POST /api/chat（对话，请求体 {"message": "..."}）
+- Web 端验证通过：时间（20:22:51 秒级准确）、计算（108）、身份（research-assistant）、健康检查（ok）
+- 对照组：CLI 阶段已验证工具价值，Web 端跳过重测
+
 ## 6. 下一步（M2）
 
 - 接入真实工具：检索、读文件等

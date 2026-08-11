@@ -15,10 +15,10 @@ from deepagents.backends import LocalShellBackend
 
 # 从 config 模块导入配置加载函数
 # load_settings() 读取 .env 里的 DeepSeek 配置并校验
-from research_assistant.config import load_settings
+from research_assistant.core.config import load_settings
 
 # 从 tools 包导入工具汇总列表（get_current_time + calculator）
-from research_assistant.tools import TOOLS
+from research_assistant.core.tools import TOOLS
 
 
 # 构建并返回主 agent 的函数

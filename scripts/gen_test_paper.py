@@ -38,21 +38,22 @@ def make_pdf(text_lines: list[str], path: str) -> None:
         f.write(bytes(pdf))
 
 
-# 测试论文内容（研究问题/方法/结果/局限齐全，供 AI 速拆）
+# 第二篇测试论文（与第一篇同主题「注意力」但结论/切入不同，供 Gap 对比找空白/矛盾）
 text = [
-    "Test Paper: A Simple Study on Attention Mechanisms",
-    "Author: Xiao Ming",
-    "Abstract: We study attention mechanisms in deep learning. We propose a",
-    "simple attention method and evaluate it on a benchmark.",
-    "1. Research Question: Does a simple additive attention work as well as",
-    "   multiplicative attention for text classification?",
-    "2. Method: We implement additive attention and compare with a",
-    "   multiplicative baseline on the AG News dataset, 5 epochs, batch 32.",
-    "3. Results: Accuracy 91.2% (additive) vs 90.8% (baseline), a small gain.",
-    "4. Limitation: Only tested on one dataset; training time is 2 hours.",
+    "Test Paper 2: Cross-Attention for Long Document Summarization",
+    "Author: Li Hua",
+    "Abstract: We study cross-attention for long document summarization.",
+    "We show cross-attention improves summary quality but costs more memory.",
+    "1. Research Question: Does cross-attention beat self-attention for long",
+    "   document summarization (over 5000 tokens)?",
+    "2. Method: Cross-attention encoder-decoder, evaluated on PubMed dataset,",
+    "   10 epochs, batch 8, with sliding window.",
+    "3. Results: ROUGE-L 42.1 (cross) vs 40.5 (self), but memory 1.8x higher.",
+    "4. Limitation: Only summarization task; memory overhead not optimized.",
 ]
-make_pdf(text, "tests/data/test_paper.pdf")
+make_pdf(text, "tests/data/test_paper2.pdf")
 
 
 # 直接放文献库？这里先输出到 data/papers/ 方便测试；也可改路径
-print("已生成测试论文 PDF。")
+import os  # 可选：也复制到 data/papers/ 便于直接入库（若用浏览器上传则不需要）
+print("已生成第二篇测试论文 PDF: tests/data/test_paper2.pdf")

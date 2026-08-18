@@ -199,6 +199,23 @@ def analyze_stream(req: AnalyzeRequest):
     return StreamingResponse(event_gen(), media_type="text/event-stream")
 
 
+# 读取单篇 Analysis（检索点开看用）
+@router.get("/{paper_id}")
+def get_paper_analysis(paper_id: str):
+    """返回一篇文献的速拆 Analysis（四字段 + 报告）。
+
+    参数:
+        paper_id: 文献 id
+    返回:
+        {analysis: 四字段, report: 全文}；无速拆则 404
+    """
+    analysis = get_analysis(paper_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="该文献还没有速拆分析")
+    report = get_analysis_report(paper_id)
+    return {"analysis": analysis, "report": report}
+
+
 # 追问请求体
 class AskRequest(BaseModel):
     """POST /api/analyze/{paper_id}/ask 请求体。

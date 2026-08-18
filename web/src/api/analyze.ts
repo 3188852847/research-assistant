@@ -33,6 +33,11 @@ export async function askAnalysis(paperId: string, question: string): Promise<{ 
   })
 }
 
+// 读取单篇 Analysis（检索点开看）：GET /api/analyze/{paperId}
+export async function getAnalysis(paperId: string): Promise<{ analysis: Record<string, string>; report: string }> {
+  return await request(`/api/analyze/${paperId}`)
+}
+
 // params: paperId, 三个回调
 //   onToolCall(工具名, 参数)   渲染工具卡片
 //   onProgress(进度行)        渲染进度

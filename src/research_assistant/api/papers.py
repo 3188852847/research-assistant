@@ -5,11 +5,13 @@
 
 import re
 from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from pathlib import Path
 
 # 导入文献库存储
 from research_assistant.core.papers.store import (
-    list_papers, save_pdf, delete_paper, get_metadata, save_metadata,
+    list_papers, save_pdf, delete_paper, get_metadata, save_metadata, paper_dir,
 )
 
 # 本模块路由
@@ -127,3 +129,27 @@ def update_metadata(paper_id: str, update: MetadataUpdate):
     # 写回
     save_metadata(paper_id, meta)
     return meta
+
+
+# 下载/预览 PDF（前端双击标题打开用）
+@router.get("/{paper_id}/pdf")
+def get_pdf(paper_id: str):
+    """返回某篇文献的 PDF 文件（用于双击标题打开/预览）。
+
+    参数:
+        paper_id: 文献 id
+    返回:
+        PDF 文件流（浏览器直接打开）
+    """
+    # 该文献文件夹
+    folder = paper_dir(paper_id)
+    pdf_path = folder / "paper.pdf"
+    # PDF 不存在
+    if not pdf_path.exists():
+        raise HTTPException(status_code=404, detail="该文献没有 PDF 文件")
+    # 返回文件（content_disposition_type="inline" 让浏览器直接预览，不下载）
+    return FileResponse(
+        pdf_path,
+        media_type="application/pdf",
+        content_disposition_type="inline",   # inline=预览，attachment=下载
+    )

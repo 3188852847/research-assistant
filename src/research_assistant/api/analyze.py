@@ -103,9 +103,13 @@ def analyze(req: AnalyzeRequest):
     if not meta.get("paper_id"):
         raise HTTPException(status_code=404, detail="文献不存在")
 
-    # 构造速拆任务的 user prompt（让 agent 用技能）
+    # 构造速拆任务的 user prompt（直接给 PDF 完整路径，避免 agent 用 ls 乱找）
+    pdf_path = f"data/papers/{paper_id}/paper.pdf"   # 该文献 PDF 的相对路径（项目根）
     task = (
-        f"请对文献库中的论文（paper_id={paper_id}）进行速拆。\n"
+        f"请对文献库中的论文进行速拆。\n"
+        f"- paper_id: {paper_id}\n"
+        f"- PDF 路径（相对项目根）: {pdf_path}\n"
+        "直接调用 read_pdf 读取上述路径的 PDF（不要用 ls 探索，路径已给出）。\n"
         "使用 speed_analyze 技能，按方法论提取四类信息。\n"
         "**必须把结果以 JSON 格式输出**，字段为 research_question / core_conclusion "
         "/ limitations / questions，值用中文。\n"
@@ -146,12 +150,17 @@ def analyze_stream(req: AnalyzeRequest):
     if not meta.get("paper_id"):
         raise HTTPException(status_code=404, detail="文献不存在")
 
-    # 速拆任务 prompt（同非流式）
+    # 速拆任务 prompt（直接给 PDF 路径，避免 ls 探索）
+    pdf_path = f"data/papers/{paper_id}/paper.pdf"
     task = (
-        f"请对文献库中的论文（paper_id={paper_id}）进行速拆。\n"
+        f"请对文献库中的论文进行速拆。\n"
+        f"- paper_id: {paper_id}\n"
+        f"- PDF 路径（相对项目根）: {pdf_path}\n"
+        "直接调用 read_pdf 读取上述路径的 PDF（不要用 ls 探索，路径已给出）。\n"
         "使用 speed_analyze 技能，按方法论提取四类信息。\n"
         "**必须把结果以 JSON 格式输出**，字段为 research_question / core_conclusion "
         "/ limitations / questions，值用中文。\n"
+        "**同时把文献元数据 title（标题）、authors（作者）、year（年份）也放进同一个 JSON。**\n"
         "随后再输出 analysis.md 报告全文（markdown）。"
     )
     thread_id = f"analyze-stream-{paper_id}-{uuid.uuid4().hex[:6]}"

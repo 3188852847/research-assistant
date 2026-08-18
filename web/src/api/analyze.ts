@@ -23,7 +23,16 @@ export async function runAnalyze(paperId: string): Promise<{ paper_id: string; a
   })
 }
 
-// 流式速拆：POST /api/analyze/stream（SSE 逐条推工具调用卡片）
+// 速拆后的追问：POST /api/analyze/{paperId}/ask
+// params: paperId 文献 id, question 用户追问
+// 返回: agent 基于该篇 Analysis 的回答
+export async function askAnalysis(paperId: string, question: string): Promise<{ answer: string }> {
+  return await request(`/api/analyze/${paperId}/ask`, {
+    method: 'POST',
+    body: { question },
+  })
+}
+
 // params: paperId, 三个回调
 //   onToolCall(工具名, 参数)   渲染工具卡片
 //   onProgress(进度行)        渲染进度

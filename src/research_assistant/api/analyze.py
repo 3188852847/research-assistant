@@ -14,7 +14,7 @@ from fastapi.responses import StreamingResponse
 # 全局唯一 agent（deps 持有，含工具/记忆/技能）
 from research_assistant.core.common.deps import agent
 # 速拆结果落盘
-from research_assistant.core.analysis.store import save_analysis
+from research_assistant.core.analysis.store import save_analysis, get_analysis
 # 文献元数据（拿 paper_id 是否存在）
 from research_assistant.core.papers.store import get_metadata
 
@@ -197,4 +197,58 @@ def analyze_stream(req: AnalyzeRequest):
         yield f"data: {json.dumps({'type':'done','analysis':fields,'report':final_reply}, ensure_ascii=False)}\n\n"
 
     return StreamingResponse(event_gen(), media_type="text/event-stream")
+
+
+# 追问请求体
+class AskRequest(BaseModel):
+    """POST /api/analyze/{paper_id}/ask 请求体。
+
+    question: 用户对速拆结果的追问
+    """
+    question: str
+
+
+# 追问：基于该篇 Analysis 回答
+@router.post("/{paper_id}/ask")
+def ask(paper_id: str, req: AskRequest):
+    """基于该篇速拆 Analysis 回答用户追问。
+
+    流程: 读 analysis.json + analysis.md -> 拼进 prompt -> invoke agent 回答
+    原则: agent 基于 Analysis 回答，引用到速拆报告的某一节（MVP 不定位 PDF 页码）
+    """
+    # 读该篇 Analysis
+    analysis = get_analysis(paper_id)
+    if not analysis:
+        raise HTTPException(status_code=404, detail="该文献还没有速拆分析，请先速拆")
+
+    # 读报告全文（也作为上下文）
+    from research_assistant.core.analysis.store import get_analysis_report
+    report = get_analysis_report(paper_id)
+
+    # 构造追问 prompt：给 agent 该篇 Analysis 作上下文
+    context = (
+        f"这是一篇文献的速拆分析：\n"
+        f"研究问题: {analysis.get('research_question', '')}\n"
+        f"核心结论: {analysis.get('core_conclusion', '')}\n"
+        f"研究局限: {analysis.get('limitations', '')}\n"
+        f"我的疑问: {analysis.get('questions', '')}\n"
+        f"{('报告全文如下：\n' + report) if report else ''}\n"
+    )
+    task = (
+        f"用户对这篇速拆结果追问：{req.question}\n\n"
+        f"{context}\n"
+        "请基于上述 Analysis 回答，引用到速拆报告的某一节（如「见核心结论一节」）。"
+        "若 Analysis 中没有答案，就诚实说「速拆信息不足，需要读原文」。"
+    )
+
+    # invoke agent 回答（独立 thread）
+    import uuid as _uuid
+    thread_id = f"ask-{paper_id}-{_uuid.uuid4().hex[:6]}"
+    result = agent.invoke(
+        {"messages": [{"role": "user", "content": task}]},
+        {"configurable": {"thread_id": thread_id}},
+    )
+    reply = result["messages"][-1].content if isinstance(result, dict) else result.value["messages"][-1].content
+
+    return {"paper_id": paper_id, "answer": reply}
 

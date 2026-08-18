@@ -14,5 +14,7 @@
 # 导出进度可视化函数
 from research_assistant.core.presenters.progress import translate_event, stream_with_progress
 
+from research_assistant.core.presenters.progress import translate_event, stream_with_progress, stream_agent
+
 # 公共出口
-__all__ = ["translate_event", "stream_with_progress"]
+__all__ = ["translate_event", "stream_with_progress", "stream_agent"]

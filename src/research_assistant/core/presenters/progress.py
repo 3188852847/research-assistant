@@ -82,3 +82,43 @@ def stream_with_progress(agent, input_data: dict, config: dict) -> Iterator[str]
         # 能翻译的才产出（None 跳过）
         if line:
             yield line
+
+
+def stream_agent(agent, input_data: dict, config: dict):
+    """流式执行 agent，边产出进度边收集推理与最终回复（高效版，不重复调用）。
+
+    与 stream_with_progress 的区别：
+    - 同时提取模型的推理内容（reasoning_content）和最终回复
+    - 产出格式：逐条 yield 进度行（str）或推理内容（("__reasoning__", 文本)），
+      结束时 yield ("__done__", 最终回复)
+    """
+    # 记录最终回复
+    final_reply = None
+
+    # 遍历 agent 的流式事件
+    for event in agent.stream(input_data, config=config):
+        # 处理 model 事件：提取推理 + 可能包含最终回复
+        for key, value in event.items():
+            if key == "model":
+                msgs = value.get("messages", [])
+                if msgs:
+                    msg = msgs[-1]
+                    # ---- 提取模型推理内容（reasoning_content）----
+                    # 推理藏在 additional_kwargs 里（invoke 会剥离，stream 可见）
+                    reasoning = getattr(msg, "additional_kwargs", {}).get("reasoning_content", None)
+                    # 有推理内容就产出（去空白）
+                    if reasoning and reasoning.strip():
+                        yield ("__reasoning__", reasoning.strip())
+
+                    # ---- 提取最终回复 ----
+                    content = getattr(msg, "content", "") or ""
+                    if content.strip():
+                        final_reply = content
+
+        # 产出进度行（复用 translate_event）
+        line = translate_event(event)
+        if line:
+            yield line
+
+    # 流结束：产出完成标记 + 最终回复
+    yield ("__done__", final_reply)

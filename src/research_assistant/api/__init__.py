@@ -14,7 +14,7 @@ from research_assistant.core.agent import build_agent
 from research_assistant.api.health import router as health_router
 from research_assistant.api.chat import router as chat_router
 from research_assistant.api.approve import router as approve_router
-
+from research_assistant.api.stream import router as stream_router
 
 
 # 创建总路由器：把各子路由合并
@@ -22,3 +22,4 @@ router = APIRouter()
 router.include_router(health_router)
 router.include_router(chat_router)
 router.include_router(approve_router)
+router.include_router(stream_router)

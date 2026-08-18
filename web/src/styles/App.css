@@ -148,3 +148,19 @@
   background: #ccc;
   cursor: not-allowed;
 }
+
+/* 打字指示器：三个跳动圆点 */
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1677ff;          /* antd 蓝 */
+  animation: typing-bounce 1.2s infinite ease-in-out;
+  display: inline-block;
+}
+
+/* 跳动动画：上下浮动 */
+@keyframes typing-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}

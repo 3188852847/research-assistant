@@ -55,7 +55,7 @@ research-assistant/
 ├── .env                 # API key（不入库）
 ├── src/research_assistant/
 │   ├── main.py          # 入口：FastAPI app 工厂 + 静态托管
-│   ├── api/             # 表现层：HTTP 路由（chat/approve/health）
+│   ├── api/             # 表现层：HTTP 路由（chat/approve/health/papers/analyze/search/gap）
 │   ├── core/            # 领域层：业务逻辑（与外壳解耦，CLI/Web 共用）
 │   │   ├── agent.py     # 主 agent 构建
 │   │   ├── config.py    # 配置加载
@@ -66,12 +66,16 @@ research-assistant/
 │   │   ├── memory/      # 记忆（AGENTS.md + store/loader 占位）
 │   │   ├── skills/      # 技能（按类别分目录，SKILL.md 按需加载）
 │   │   ├── human_in_the_loop/  # 人机回环子系统
-│   │   └── presenters/  # 呈现层（思考过程可视化）
+│   │   ├── presenters/  # 呈现层（思考过程可视化）
+│   │   ├── papers/      # 文献库核心（store 文件存储）
+│   │   ├── analysis/    # 速拆核心（store 落盘 analysis.json + analysis.md）
+│   │   └── ...
 │   └── infrastructure/  # 基础设施层：日志/异常/token 统计/SQLite 持久化
-├── web/                 # 前端（React+TS，独立于 Python 包）
-│   └── src/{pages,components,api,hooks,styles}
+├── web/                 # 前端（React+TS antd，feature-based）
+│   └── src/{api,components,features,layouts,hooks,styles}
+│       └── features/{dashboard,chat,papers,analyze,search,gap}
 ├── tests/               # 测试（unit/ 分层）
-└── data/                # 运行时数据（checkpoints.sqlite，不入库）
+└── data/                # 运行时数据（checkpoints.sqlite、papers/ 文献库）
 ```
 
 ## 五、开发计划（里程碑）
@@ -87,7 +91,7 @@ research-assistant/
 - **M7 收尾**：文档补全、测试补全、复盘沉淀
 
 > **Web 路线**：M1-M5 全程 FastAPI + Swagger 交互文档（浏览器点按钮就能测，比 CLI 好看且零前端成本）→ M6 一次性上真前端。
-> **当前进度**：M1-M7 全部完成（2026-08-11）。五大能力 + Web 前端 + 思考过程可视化已落地；结构大优化（api/core/infrastructure 分层、web 移到根目录）；基础设施（日志/异常/token 统计/SQLite 持久化）已建。见 `docs/` 各版本说明。
+> **当前进度**：M1-M7 完成（2026-08-11）+ 前端重建 V2（antd 暗色玻璃拟态 + feature-based）+ **MVP 文献速拆工作流 5 条验收全通（2026-08-19）**。详见 `docs/` 各版本说明。
 ## 六、验收标准
 
 每个里程碑完成后自问：
@@ -103,7 +107,19 @@ research-assistant/
 - [x] 预算控制 → 已建 token 用量统计（infrastructure/tracing.py），可量化评估
 - [ ] 记忆方案（文件 / 向量库 / 复用腾讯记忆栈？）→ 已落地文件版（M4），向量库升级待研究
 
-## 八、使用说明
+## 八、MVP 验收（2026-08-19 全通）
+
+| # | 验收项 | 实现 |
+|---|--------|------|
+| 1 | 导入 PDF 进库 | 文库上传 + 元数据并入速拆 |
+| 2 | 速拆（按方法论产四字段，卡片流可见） | analyze + speed_analyze skill + 卡片流 |
+| 3 | 追问（基于 Analysis 引用） | /api/analyze/{id}/ask |
+| 4 | 检索（命中 Analysis，点开看） | /api/search（grep 扫 Analysis） |
+| 5 | Gap（多篇对比产报告） | /api/gap（拼多篇 Analysis 喂 agent） |
+
+**核心循环**：丢 PDF → 速拆（read_pdf 卡片流 → 四字段）→ 追问 → 检索 → Gap 找研究方向。
+
+## 九、使用说明
 
 ### 开发模式（前后端分离，热更新）
 - 后端：`uv run uvicorn research_assistant.main:app --reload`（:8000，Swagger 在 /docs）

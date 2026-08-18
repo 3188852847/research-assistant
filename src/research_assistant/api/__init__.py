@@ -15,6 +15,8 @@ from research_assistant.api.health import router as health_router
 from research_assistant.api.chat import router as chat_router
 from research_assistant.api.approve import router as approve_router
 from research_assistant.api.stream import router as stream_router
+from research_assistant.api.papers import router as papers_router
+from research_assistant.api.analyze import router as analyze_router
 
 
 # 创建总路由器：把各子路由合并
@@ -23,3 +25,5 @@ router.include_router(health_router)
 router.include_router(chat_router)
 router.include_router(approve_router)
 router.include_router(stream_router)
+router.include_router(papers_router)
+router.include_router(analyze_router)

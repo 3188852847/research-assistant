@@ -50,9 +50,8 @@ export default function MainLayout() {
     // 整体背景加光斑（毛玻璃有东西可模糊）
     <Layout style={{ height: '100vh' }} className="page-bg">
       {/* 顶栏：应用切换器（多应用容器，跨应用切换） */}
-      <Header style={{
+      <Header className="glass-panel" style={{
         display: 'flex', alignItems: 'center', gap: 12, padding: '0 16px',
-        background: 'var(--bg-elevated)', borderBottom: '1px solid var(--glass-border)',
         height: 48, lineHeight: '48px',
       }}>
         <Select value="research" style={{ width: 200 }} options={apps} />
@@ -61,13 +60,11 @@ export default function MainLayout() {
 
       {/* 主体：左导航 + 内容区（占满剩余，flex 纵向） */}
       <Layout style={{ background: 'transparent', flex: 1 }}>
-        {/* 左导航：当前应用内的模块 */}
+        {/* 左导航：保留 antd Sider（保证布局），Menu 用玻璃化 CSS */}
         <Sider
           width={200}
-          style={{
-            background: 'var(--bg-elevated)',
-            borderRight: '1px solid var(--glass-border)',
-          }}
+          className="glass-panel nav-sider"
+          style={{ borderRight: 'none' }}
         >
           <Menu
             mode="inline"
@@ -87,9 +84,8 @@ export default function MainLayout() {
 
       {/* 底部 AI 栏：全宽（整个 Layout 最底，不被左导航挡），非对话页才显示 */}
       {!isChatPage && (
-        <div style={{
-          padding: 12, borderTop: '1px solid var(--glass-border)',
-          background: 'var(--bg-elevated)', display: 'flex', gap: 8,
+        <div className="glass-panel" style={{
+          padding: 12, display: 'flex', gap: 8, borderTop: 'none', borderLeft: 'none', borderRight: 'none',
         }}>
           <Input
             value={aiInput}

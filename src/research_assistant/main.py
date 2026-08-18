@@ -41,7 +41,7 @@ def create_app() -> FastAPI:
     # 挂载前端静态文件（M6 生产模式）
     # StaticFiles(html=True) 会自动伺服 index.html
     # 注意：必须在所有 API 路由注册之后挂载（/ 是兜底路径，先挂会拦截一切）
-    app.mount("/", StaticFiles(directory=str(WEB_DIST), html=True), name="static")
+    # app.mount("/", StaticFiles(directory=str(WEB_DIST), html=True), name="static")
 
     return app
 
